@@ -34,6 +34,20 @@ describe(Support.getTestDialectTeaser('Model'), () => {
         });
     });
 
+    it('safeAlter should fail to remove a column if it exists in the databases schema but not the model', function() {
+      const User = this.sequelize.define('testSync', {
+        name: Sequelize.STRING,
+        age: Sequelize.INTEGER
+      });
+      return this.sequelize.sync()
+        .then(() => {
+          this.sequelize.define('testSync', {
+            name: Sequelize.STRING
+          });
+        })
+        .then(() => expect(this.sequelize.sync({safeAlter: true})).to.be.rejected);
+    });
+
     it('should add a column if it exists in the model but not the database', function() {
       const testSync = this.sequelize.define('testSync', {
         name: Sequelize.STRING
